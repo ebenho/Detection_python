@@ -1,0 +1,2 @@
+MODEL_PATH = "yolo8n.pt"
+CONFIDENCE_THRESHOLD = 0.5
