@@ -1,65 +1,57 @@
-import streamlit as st
+import tkinter as tk
+from tkinter import filedialog, Label, Button
+from PIL import Image, ImageTk
 from ultralytics import YOLO
-import tempfile
-import cv2
 import os
 
 # Load YOLO model (COCO pre-trained)
-model = YOLO("yolov8n.pt")  
+model = YOLO("yolov8n.pt")  # file model bạn đã có ở thư mục gốc
 
-st.set_page_config(page_title="Object Detection App", page_icon="🚀", layout="wide")
-st.title("🚀 Object Detection App")
-st.write("Nhận dạng **người, đồ vật, loài vật** trong ảnh, video và webcam.")
+# Tạo thư mục output nếu chưa có
+os.makedirs("outputs/results", exist_ok=True)
 
-# Sidebar chọn chế độ
-mode = st.sidebar.radio("Chọn chế độ:", ["Ảnh", "Video", "Webcam"])
+def detect_image():
+    # Chọn file ảnh
+    file_path = filedialog.askopenfilename(
+        initialdir="data/images",
+        filetypes=[("Image files", "*.jpg;*.jpeg;*.png")]
+    )
+    if not file_path:
+        return
+    
+    # Chạy YOLO detect
+    results = model(file_path, save=True, project="outputs", name="results", exist_ok=True)
+    
+    # Lấy file kết quả YOLO vẽ bounding box
+    output_file = os.path.join("outputs/results", os.path.basename(file_path))
+    
+    # Hiển thị ảnh kết quả
+    img = Image.open(output_file)
+    img = img.resize((500, 400))  # resize cho vừa cửa sổ
+    tk_img = ImageTk.PhotoImage(img)
+    panel.config(image=tk_img)
+    panel.image = tk_img
 
-# ========== ẢNH ==========
-if mode == "Ảnh":
-    uploaded_file = st.file_uploader("📷 Chọn ảnh...", type=["jpg", "jpeg", "png"])
-    if uploaded_file:
-        # Lưu file tạm
-        temp_file = tempfile.NamedTemporaryFile(delete=False)
-        temp_file.write(uploaded_file.read())
-        temp_file.close()
+    # Hiển thị số đối tượng
+    num_objects = len(results[0].boxes)
+    info_label.config(text=f"✅ Phát hiện {num_objects} đối tượng.")
 
-        # Chạy detection
-        results = model(temp_file.name)
+# =================== Giao diện Tkinter ===================
+root = tk.Tk()
+root.title("🚀 Object Detection App (Tkinter)")
+root.geometry("650x550")
+root.configure(bg="#f5f5f5")
 
-        # Hiển thị kết quả
-        for r in results:
-            st.image(r.plot(), caption="Kết quả nhận dạng", use_container_width=True)
+title = Label(root, text="Ứng dụng Nhận dạng Đối tượng", font=("Arial", 18, "bold"), bg="#f5f5f5", fg="#333")
+title.pack(pady=10)
 
-        os.remove(temp_file.name)
+btn = Button(root, text="📂 Chọn ảnh để nhận dạng", command=detect_image, font=("Arial", 12), bg="#007BFF", fg="white")
+btn.pack(pady=10)
 
-# ========== VIDEO ==========
-elif mode == "Video":
-    uploaded_video = st.file_uploader("🎥 Chọn video...", type=["mp4", "avi", "mov"])
-    if uploaded_video:
-        # Lưu file video tạm
-        temp_video = tempfile.NamedTemporaryFile(delete=False)
-        temp_video.write(uploaded_video.read())
-        temp_video.close()
+info_label = Label(root, text="", font=("Arial", 12), bg="#f5f5f5", fg="green")
+info_label.pack(pady=5)
 
-        # Xuất video kết quả
-        output_path = temp_video.name + "_out.mp4"
-        results = model.predict(source=temp_video.name, save=True, project="outputs", name="video_results")
+panel = Label(root, bg="#f5f5f5")
+panel.pack(pady=10)
 
-        # Hiển thị video
-        st.video(f"outputs/video_results/{os.path.basename(temp_video.name)}")
-
-# ========== WEBCAM ==========
-elif mode == "Webcam":
-    st.write("⚡ Webcam realtime detection (chạy bằng OpenCV)")
-    run = st.checkbox("Bật Webcam")
-    if run:
-        cap = cv2.VideoCapture(0)
-        stframe = st.empty()
-        while run:
-            ret, frame = cap.read()
-            if not ret:
-                break
-            results = model(frame)
-            annotated_frame = results[0].plot()
-            stframe.image(annotated_frame, channels="BGR", use_container_width=True)
-        cap.release()
+root.mainloop()
