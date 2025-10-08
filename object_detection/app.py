@@ -20,7 +20,7 @@ root.title("🚀 Object Detection App")
 root.geometry("1100x700")
 
 # ========== ẢNH NỀN ==========
-bg_image = Image.open("object_detection\Background.png").resize((1100, 700))
+bg_image = Image.open("object_detection/Background.png").resize((1100, 700))
 bg_photo = ImageTk.PhotoImage(bg_image)
 bg_label = tb.Label(root, image=bg_photo)
 bg_label.place(x=0, y=0, relwidth=1, relheight=1)  # full background
@@ -34,7 +34,7 @@ lbl = tb.Label(root, background="", borderwidth=0)
 lbl.place(x=200, y=0, relwidth=0.8, relheight=0.95)
 
 # Set ảnh mặc định để tránh nền trắng
-default_img = Image.open("object_detection\Background.png").resize((850, 600))
+default_img = Image.open("object_detection/Background.png").resize((850, 600))
 default_photo = ImageTk.PhotoImage(default_img)
 lbl.config(image=default_photo)
 lbl.image = default_photo
