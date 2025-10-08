@@ -1,6 +1,5 @@
 import cv2
 from ultralytics import YOLO
-import os
 
 # Hàm load YOLOv8n model (dùng chung)
 def load_model(model_name="yolov8n.pt"):
@@ -20,4 +19,3 @@ def detect_image(model, img_path):
 def save_image(img, output_path):
     cv2.imwrite(output_path, img)
     print(f"Saved result to {output_path}")
-
