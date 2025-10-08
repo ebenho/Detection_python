@@ -1,73 +1,59 @@
-# ===============================
-# video_detector.py
-# Nhận dạng đối tượng trong video bằng YOLOv8
-# ===============================
-
 from ultralytics import YOLO
-import cv2
-import os
+import cv2, os, time
 
-def detect_video(video_path, output_path="outputs/result_video.mp4", model_path="yolov8n.pt"):
+def detect_video(video_path, model_path="yolov8n.pt"):
     """
-    Hàm nhận dạng đối tượng trong video.
-    
-    Args:
-        video_path (str): Đường dẫn đến video cần nhận dạng.
-        output_path (str): Đường dẫn lưu video kết quả (mp4).
-        model_path (str): File model YOLO (vd: yolov8n.pt, yolov8s.pt,...)
+    Nhận dạng đối tượng trong video bằng YOLOv8 (tối ưu cho CPU)
     """
-
-    # Kiểm tra video tồn tại
     if not os.path.exists(video_path):
         print(f"❌ Không tìm thấy video: {video_path}")
         return
 
-    # Load model YOLO
-    print(f"🚀 Đang load model YOLO từ {model_path} ...")
+    print("🚀 Đang load model YOLO (CPU)...")
     model = YOLO(model_path)
 
-    # Mở video
     cap = cv2.VideoCapture(video_path)
+    if not cap.isOpened():
+        print("❌ Không thể mở video.")
+        return
 
-    # Lấy thông tin video
-    width = int(cap.get(cv2.CAP_PROP_FRAME_WIDTH))
-    height = int(cap.get(cv2.CAP_PROP_FRAME_HEIGHT))
-    fps = cap.get(cv2.CAP_PROP_FPS)
-
-    # Tạo writer để lưu video kết quả
-    os.makedirs(os.path.dirname(output_path), exist_ok=True)
-    fourcc = cv2.VideoWriter_fourcc(*'mp4v')
-    out = cv2.VideoWriter(output_path, fourcc, fps, (width, height))
-
-    print("🎥 Bắt đầu xử lý video... (nhấn Q để thoát sớm)\n")
+    frame_count = 0
+    print("🎥 Bắt đầu nhận dạng realtime (nhấn Q để thoát)\n")
 
     while True:
         ret, frame = cap.read()
         if not ret:
+            print("📁 Video đã phát hết.")
             break
 
-        # Dự đoán bằng YOLO
-        results = model(frame, verbose=False)
+        frame_count += 1
+        # Chỉ xử lý 1/5 frame để giảm tải CPU
+        if frame_count % 5 != 0:
+            continue
 
-        # Vẽ khung nhận dạng
+        # Giảm kích thước input (tăng tốc)
+        frame_resized = cv2.resize(frame, (320, 320))
+
+        start_time = time.time()
+        results = model(frame_resized, verbose=False)
         annotated_frame = results[0].plot()
 
-        # Ghi vào video output
-        out.write(annotated_frame)
+        fps = 1 / (time.time() - start_time + 1e-6)
 
-        # Hiển thị trực tiếp
-        cv2.imshow("YOLO Video Detection", annotated_frame)
+        # Hiển thị FPS
+        cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (20, 40),
+                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+
+        cv2.imshow("YOLOv8 CPU Video Detection", annotated_frame)
+
         if cv2.waitKey(1) & 0xFF == ord('q'):
+            print("🛑 Dừng video theo yêu cầu người dùng.")
             break
 
-    # Giải phóng bộ nhớ
     cap.release()
-    out.release()
     cv2.destroyAllWindows()
-    print(f"✅ Hoàn thành! Video kết quả lưu tại: {output_path}")
-    
+    print("✅ Kết thúc nhận dạng video.")
 
 if __name__ == "__main__":
-    # Ví dụ chạy trực tiếp file này
-    test_video = "test_video.mp4"  # Đặt file video test của bạn ở thư mục gốc
+    test_video = "test_video.mp4"  # đổi tên video của bạn
     detect_video(test_video)
