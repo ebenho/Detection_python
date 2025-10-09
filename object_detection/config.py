@@ -1,3 +1,5 @@
+MODEL_PATH = "yolo8n.pt"
+CONFIDENCE_THRESHOLD = 0.5
 # Configuration settings for the object detection app
 class Config:
     # Window settings
