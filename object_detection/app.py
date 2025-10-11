@@ -35,10 +35,15 @@ menu_frame.pack(side="left", fill="y")
 # ===== KHU HIỂN THỊ KẾT QUẢ =====
 lbl = tb.Label(root, background="", borderwidth=0)
 lbl.place(x=200, y=0, relwidth=0.8, relheight=0.95)
+# ===== KHUNG NÚT VIDEO (Pause / Replay) =====
+video_control_frame = tb.Frame(root, bootstyle="light")
+video_control_frame.place(x=450, y=630)  # vị trí dưới khung video, có thể chỉnh
+
+btn_pause = None
+btn_replay = None
 
 # Set ảnh mặc định để tránh nền trắng
 default_img = Image.open("object_detection/assets/Background.png").resize((1100, 700))
-
 default_photo = ImageTk.PhotoImage(default_img)
 lbl.config(image=default_photo)
 lbl.image = default_photo
@@ -50,6 +55,7 @@ cap = None
 frame_count = 0
 running_mode = None
 after_id = None  # để hủy vòng lặp Tkinter
+paused = False
 
 def update_status(msg):
     status.config(text=msg)
@@ -102,14 +108,38 @@ def stop_current():
     cap = None
     update_status("⏹ Đã dừng video/camera.")
    
+# ====== HÀM PAUSE / REPLAY ======
+def toggle_pause():
+    global paused
+    paused = not paused
+    if paused:
+        update_status("⏸ Video tạm dừng.")
+        btn_pause.config(text="▶ Tiếp tục", bootstyle="success-outline")
+    else:
+        update_status("🎬 Tiếp tục phát video...")
+        btn_pause.config(text="⏸ Tạm dừng", bootstyle="warning-outline")
 
+def replay_video():
+    global cap, running_mode, frame_count, paused
+    if running_mode != "video" or cap is None:
+        update_status("⚠️ Không có video nào để phát lại.")
+        return
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
+    frame_count = 0
+    paused = False
+    btn_pause.config(text="⏸ Tạm dừng", bootstyle="warning-outline")
+    update_status("🔁 Phát lại video từ đầu.")
+    
 # ===== XỬ LÝ VIDEO =====
 def detect_video():
     stop_current()
     global cap, frame_count, running_mode
     running_mode = "video"
-    cap = cv2.VideoCapture(filedialog.askopenfilename(filetypes=[("Video", "*.mp4;*.avi;*.mov")]))
-    if not cap or not cap.isOpened():
+    file_path = filedialog.askopenfilename(filetypes=[("Video", "*.mp4;*.avi;*.mov")])
+    if not file_path:
+        return
+    cap = cv2.VideoCapture(file_path)
+    if not cap.isOpened():
         update_status("❌ Không thể mở video.")
         return
     frame_count = 0
@@ -130,10 +160,14 @@ def detect_camera():
 
 # ===== VÒNG LẶP XỬ LÝ CHUNG =====
 def process_stream():
-    global cap, frame_count, running_mode, after_id
+    global cap, frame_count, running_mode, after_id, paused
     if cap is None or running_mode not in ("video", "camera"):
         return
-
+    
+    if paused:  # 🟡 Khi pause thì không đọc frame mới
+        after_id = root.after(100, process_stream)
+        return
+    
     ret, frame = cap.read()
     if not ret:
         update_status("📁 Kết thúc hoặc mất tín hiệu.")
@@ -161,7 +195,13 @@ def process_stream():
 tb.Button(menu_frame, text="📷 Ảnh", bootstyle=SUCCESS, command=detect_image_gui, width=15).pack(pady=15)
 tb.Button(menu_frame, text="🎥 Video", bootstyle=INFO, command=detect_video, width=15).pack(pady=15)
 tb.Button(menu_frame, text="📡 Camera", bootstyle=PRIMARY, command=detect_camera, width=15).pack(pady=15)
-tb.Button(menu_frame, text="⏹ Dừng", bootstyle=SECONDARY, command=stop_current, width=15).pack(pady=15)
 tb.Button(menu_frame, text="❌ Thoát", bootstyle=DANGER, command=root.destroy, width=15).pack(pady=15)
+
+# ===== NÚT ĐIỀU KHIỂN VIDEO =====
+btn_pause = tb.Button(video_control_frame, text="⏸ Tạm dừng", bootstyle="warning-outline", command=toggle_pause)
+btn_pause.pack(side="left", padx=10)
+
+btn_replay = tb.Button(video_control_frame, text="🔁 Phát lại", bootstyle="info-outline", command=replay_video)
+btn_replay.pack(side="left", padx=10)
 
 root.mainloop()
