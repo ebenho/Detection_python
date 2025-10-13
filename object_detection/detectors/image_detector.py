@@ -34,6 +34,24 @@ def detect_from_folder():
             else:
                 print(f"Bỏ qua: {filename}")
     print("Hoàn tất nhận diện thư mục inputs!")
+    
+def detect_single_image(image_path):
+    """Nhận diện một ảnh và lưu vào thư mục outputs."""
+    if not os.path.isfile(image_path):
+        print(f"File không tồn tại: {image_path}")
+        return None
+
+    filename = os.path.basename(image_path)
+    output_path = os.path.join(OUTPUT_DIR, filename)
+
+    annotated = detect_image(model, image_path)
+    if annotated is not None:
+        save_image(annotated, output_path)
+        print(f"{filename} -> Done")
+        return output_path
+    else:
+        print(f"Không thể đọc ảnh: {filename}")
+        return None
 
 
 # Chạy trực tiếp nếu gọi file này

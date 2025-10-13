@@ -1,3 +1,6 @@
+import os
+
+
 MODEL_PATH = "yolo8n.pt"
 CONFIDENCE_THRESHOLD = 0.5
 # Configuration settings for the object detection app
@@ -23,3 +26,8 @@ class Config:
     # File types
     IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
     VIDEO_EXTENSIONS = (".mp4", ".avi", ".mov")
+    
+    INPUTS = "input"
+    OUTPUTS = "output"
+    BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    MODELS_DIR = os.path.join(BASE_DIR, "assets", "models")
