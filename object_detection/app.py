@@ -1,11 +1,13 @@
 import os
 import time
 import cv2
+from torch import classes
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 from ultralytics import YOLO
+from webcolors import names
 from detectors.image_detector import detect_single_image
 from config import Config
 
@@ -217,17 +219,7 @@ def process_stream():
         annotated = results[0].plot()
         fps = 1 / (time.time() - start + Config.MIN_FPS)
 
-        # Thêm overlay FPS và số đối tượng ngay trên hình
-        cv2.putText(
-            annotated,
-            f"{running_mode.upper()} | FPS: {fps:.1f} | Obj: {len(results[0].boxes)}",
-            (15, 35),
-            cv2.FONT_HERSHEY_SIMPLEX,
-            0.9,
-            (255, 255, 0),
-            2,
-            cv2.LINE_AA
-        )
+    
 
         # Hiển thị hình ảnh
         img = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
@@ -235,6 +227,25 @@ def process_stream():
         imgtk = ImageTk.PhotoImage(image=img)
         lbl.imgtk = imgtk
         lbl.config(image=imgtk)
+
+        # ===== PHÂN LOẠI THEO NHÓM =====
+        names = results[0].names
+        classes = results[0].boxes.cls.tolist() if len(results[0].boxes) > 0 else []
+        
+        # Danh sách nhóm
+        people_labels = ["person"]
+        animal_labels = ["dog", "cat", "bird", "horse", "cow", "sheep", "elephant", "bear", "zebra", "giraffe"]
+        object_labels = [n for n in names.values() if n not in people_labels + animal_labels]
+
+        # Đếm từng loại
+        num_people = sum(1 for c in classes if names[int(c)] in people_labels)
+        num_animals = sum(1 for c in classes if names[int(c)] in animal_labels)
+        num_objects = sum(1 for c in classes if names[int(c)] in object_labels)
+
+        # ===== HIỂN THỊ KẾT QUẢ =====
+        update_status(
+    f"{running_mode.upper()} | FPS: {fps:.1f} | Người: {num_people} |  Động vật: {num_animals} | Đồ vật: {num_objects}"
+)
 
     after_id = root.after(Config.FRAME_DELAY, process_stream)
 
