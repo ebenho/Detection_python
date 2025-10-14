@@ -1,8 +1,5 @@
 import os
 
-
-MODEL_PATH = "yolo8n.pt"
-CONFIDENCE_THRESHOLD = 0.5
 # Configuration settings for the object detection app
 class Config:
     # Window settings
@@ -11,11 +8,13 @@ class Config:
     MENU_WIDTH = 200
 
     # YOLO model settings
-    MODEL_PATH = "yolov8n.pt"
+    MODEL_PATH = "yolov8n.pt"  # Sử dụng tên mô hình thống nhất
     OUTPUT_DIR = "outputs"
     RESULTS_SUBDIR = "results"
 
     # Image processing settings
+    IMAGE_W = 850  # Thêm để khớp với app.py
+    IMAGE_H = 600  # Thêm để khớp với app.py
     IMAGE_RESIZE_WIDTH = 850
     IMAGE_RESIZE_HEIGHT = 600
 
@@ -27,7 +26,16 @@ class Config:
     IMAGE_EXTENSIONS = (".jpg", ".jpeg", ".png")
     VIDEO_EXTENSIONS = (".mp4", ".avi", ".mov")
     
-    INPUTS = "input"
-    OUTPUTS = "output"
+    # Đường dẫn cơ bản
     BASE_DIR = os.path.dirname(os.path.abspath(__file__))
+    INPUTS = os.path.join(BASE_DIR, "input")
+    OUTPUTS = os.path.join(BASE_DIR, "output")
     MODELS_DIR = os.path.join(BASE_DIR, "assets", "models")
+    
+    # Ngưỡng độ tin cậy
+    CONFIDENCE_THRESHOLD = 0.5
+
+# Kiểm tra và tạo thư mục nếu chưa tồn tại
+os.makedirs(Config.INPUTS, exist_ok=True)
+os.makedirs(os.path.join(Config.OUTPUTS, Config.RESULTS_SUBDIR), exist_ok=True)
+os.makedirs(Config.MODELS_DIR, exist_ok=True)

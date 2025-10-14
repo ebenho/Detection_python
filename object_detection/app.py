@@ -1,19 +1,20 @@
 import os
+import threading
 import time
 import cv2
-from torch import classes
+#from torch import classes
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from tkinter import filedialog, messagebox
 from PIL import Image, ImageTk
 from ultralytics import YOLO
-from webcolors import names
+#from webcolors import names
 from detectors.image_detector import detect_single_image
 from config import Config
 
 # ===== Khởi tạo thư mục =====
 os.makedirs(Config.INPUTS, exist_ok=True)
-os.makedirs(Config.OUTPUTS, exist_ok=True)
+os.makedirs(os.path.join(Config.OUTPUTS, "results"), exist_ok=True)
 
 # ===== Nạp mô hình =====
 model = YOLO(os.path.join(Config.MODELS_DIR, Config.MODEL_PATH))
@@ -88,32 +89,46 @@ def update_status(msg):
     
 
 # ===== Nhận diện ảnh =====
+import threading
+
+# ===== Nhận diện ảnh =====
 def detect_image_gui():
+    """Chọn ảnh và nhận diện trong thread phụ (UI không bị đơ)"""
     global cap
     stop_current()
     video_control_frame.place_forget()
 
-    file_path = filedialog.askopenfilename(
-        filetypes=[("Ảnh", "*.jpg;*.jpeg;*.png")]
-    )
+    file_path = filedialog.askopenfilename(filetypes=[("Ảnh", "*.jpg;*.jpeg;*.png")])
     if not file_path:
         return
 
-    try:
-        output_path = detect_single_image(file_path)
-        if output_path is None:
-            update_status("Không đọc được ảnh.")
-            return
-    except Exception as e:
-        update_status(f"Lỗi khi nhận diện ảnh: {e}")
-        return
+    update_status("🖼️ Đang nhận diện ảnh... Vui lòng đợi.")
 
-    img = Image.open(output_path).resize((Config.IMAGE_W, Config.IMAGE_H))
-    imgtk = ImageTk.PhotoImage(img)
-    lbl.place(x=280, y=15, relwidth=0.7, relheight=0.9)
-    lbl.config(image=imgtk)
-    lbl.image = imgtk
-    update_status(f"Ảnh: {os.path.basename(file_path)} | Đã lưu: {output_path}")
+    def worker():
+        try:
+            # Gọi YOLO trong luồng phụ
+            output_path = detect_single_image(file_path, model)
+            if not output_path:
+                root.after(0, lambda: update_status("❌ Không thể nhận diện ảnh."))
+                return
+
+            img = Image.open(output_path).resize((Config.IMAGE_RESIZE_WIDTH, Config.IMAGE_RESIZE_HEIGHT))  # Sử dụng IMAGE_RESIZE_WIDTH và IMAGE_RESIZE_HEIGHT
+            imgtk = ImageTk.PhotoImage(img)
+
+            def update_ui():
+                lbl.place(x=280, y=15, relwidth=0.7, relheight=0.9)
+                lbl.config(image=imgtk)
+                lbl.image = imgtk
+                update_status(f"✅ Ảnh: {os.path.basename(file_path)} | Đã lưu: {output_path}")
+
+            root.after(0, update_ui)
+
+        except Exception as e:
+            err_msg = str(e)
+            root.after(0, lambda msg=err_msg: update_status(f"❌ Lỗi khi nhận diện: {msg}"))
+
+    # chạy YOLO trong thread riêng
+    threading.Thread(target=worker, daemon=True).start()
 
 # ===== Dừng video / camera =====
 def stop_current():

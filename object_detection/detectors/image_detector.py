@@ -1,59 +1,47 @@
 import os
-import cv2
-from ultralytics import YOLO
-from utils.image_utils import detect_image, save_image
 
-
-# --- Đường dẫn chuẩn ---
-CURRENT_DIR = os.path.dirname(os.path.abspath(__file__))   # detectors/
-PROJECT_ROOT = os.path.dirname(CURRENT_DIR)                # project_root/
-DATA_DIR = os.path.join(PROJECT_ROOT, "data")
-INPUT_DIR = os.path.join(DATA_DIR, "inputs")
-OUTPUT_DIR = os.path.join(DATA_DIR, "outputs")
-MODEL_PATH = os.path.join(PROJECT_ROOT, "assets", "models", "yolov8n.pt")
-
-os.makedirs(INPUT_DIR, exist_ok=True)
-os.makedirs(OUTPUT_DIR, exist_ok=True)
-
-# --- Load YOLO model ---
-model = YOLO(MODEL_PATH)
-print(f"Model loaded from {MODEL_PATH}")
-
-
-def detect_from_folder():
-    """Nhận diện tất cả ảnh trong thư mục inputs và lưu vào outputs."""
-    for filename in os.listdir(INPUT_DIR):
-        if filename.lower().endswith((".jpg", ".jpeg", ".png")):
-            input_path = os.path.join(INPUT_DIR, filename)
-            output_path = os.path.join(OUTPUT_DIR, filename)
-
-            annotated = detect_image(model, input_path)
-            if annotated is not None:
-                save_image(annotated, output_path)
-                print(f"{filename} -> Done")
-            else:
-                print(f"Bỏ qua: {filename}")
-    print("Hoàn tất nhận diện thư mục inputs!")
-    
-def detect_single_image(image_path):
-    """Nhận diện một ảnh và lưu vào thư mục outputs."""
+def detect_single_image(image_path, model):
+    """
+    Nhận diện 1 ảnh bằng model YOLO đã load sẵn trong app.py
+    Trả về đường dẫn ảnh kết quả (outputs/results/xxx.jpg)
+    """
     if not os.path.isfile(image_path):
-        print(f"File không tồn tại: {image_path}")
+        print(f"❌ File không tồn tại: {image_path}")
         return None
 
-    filename = os.path.basename(image_path)
-    output_path = os.path.join(OUTPUT_DIR, filename)
+    # Xác định đường dẫn tuyệt đối đến thư mục outputs/results
+    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../"))
+    output_dir = os.path.join(base_dir, "outputs", "results")
+    os.makedirs(output_dir, exist_ok=True)
 
-    annotated = detect_image(model, image_path)
-    if annotated is not None:
-        save_image(annotated, output_path)
-        print(f"{filename} -> Done")
-        return output_path
+    try:
+        # YOLO tự động lưu kết quả vào outputs/results
+        results = model.predict(
+            source=image_path,
+            project=os.path.join(base_dir, "outputs"),
+            name="results",
+            exist_ok=True,
+            save=True
+        )
+    except Exception as e:
+        print(f"⚠️ Lỗi khi chạy YOLO: {e}")
+        return None
+
+    # Đường dẫn ảnh kết quả
+    output_file = os.path.join(output_dir, os.path.basename(image_path))
+
+    # Một số bản YOLO không tự ghi đè ảnh, cần kiểm tra lại
+    if not os.path.exists(output_file):
+        # lấy ảnh chú thích từ YOLO rồi lưu thủ công
+        annotated = results[0].plot()
+        from PIL import Image
+        import cv2
+        annotated = cv2.cvtColor(annotated, cv2.COLOR_BGR2RGB)
+        Image.fromarray(annotated).save(output_file)
+
+    if os.path.exists(output_file):
+        print(f"✅ Đã xử lý: {output_file}")
+        return output_file
     else:
-        print(f"Không thể đọc ảnh: {filename}")
+        print("⚠️ Không tìm thấy ảnh kết quả.")
         return None
-
-
-# Chạy trực tiếp nếu gọi file này
-if __name__ == "__main__":
-    detect_from_folder()
