@@ -2,8 +2,13 @@
 # tests/test_video.py
 # Kiểm thử chức năng nhận dạng video bằng YOLOv8
 # ===============================
+import sys
+import os
 
-from object_detection.video_detector import detect_video
+# Thêm thư mục gốc (DETECTION_PYTHON) vào sys.path
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
+
+from object_detection.detectors.video_detector import detect_video
 import os
 
 if __name__ == "__main__":

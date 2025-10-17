@@ -1,9 +1,11 @@
 from ultralytics import YOLO
 import cv2, os, time
+from object_detection.utils.save_log import save_detection_log
 
 def detect_video(video_path, model_path="yolov8n.pt"):
     """
-    Nhận dạng đối tượng trong video bằng YOLOv8 (tối ưu cho CPU)
+    Nhận dạng đối tượng trong video.
+    Chỉ lưu log CSV, không sinh video/ảnh.
     """
     if not os.path.exists(video_path):
         print(f"❌ Không tìm thấy video: {video_path}")
@@ -18,6 +20,8 @@ def detect_video(video_path, model_path="yolov8n.pt"):
         return
 
     frame_count = 0
+    results_summary = []  # lưu nhãn & độ chính xác
+
     print("🎥 Bắt đầu nhận dạng realtime (nhấn Q để thoát)\n")
 
     while True:
@@ -27,33 +31,27 @@ def detect_video(video_path, model_path="yolov8n.pt"):
             break
 
         frame_count += 1
-        # Chỉ xử lý 1/5 frame để giảm tải CPU
         if frame_count % 5 != 0:
             continue
 
-        # Giảm kích thước input (tăng tốc)
-        frame_resized = cv2.resize(frame, (320, 320))
-
         start_time = time.time()
-        results = model(frame_resized, verbose=False)
-        annotated_frame = results[0].plot()
+        results = model(frame, verbose=False)
+
+        # ✅ Thu thập kết quả
+        for r in results:
+            for box in r.boxes:
+                cls = int(box.cls[0])
+                label = model.names[cls]
+                conf = float(box.conf[0])
+                results_summary.append((label, conf))
 
         fps = 1 / (time.time() - start_time + 1e-6)
+        cv2.imshow("YOLO Video Detection", results[0].plot())
 
-        # Hiển thị FPS
-        cv2.putText(annotated_frame, f"FPS: {fps:.2f}", (20, 40),
-                    cv2.FONT_HERSHEY_SIMPLEX, 1, (0, 255, 0), 2)
+        
 
-        cv2.imshow("YOLOv8 CPU Video Detection", annotated_frame)
-
-        if cv2.waitKey(1) & 0xFF == ord('q'):
-            print("🛑 Dừng video theo yêu cầu người dùng.")
-            break
-
+    # ✅ Ghi log
+    save_detection_log("Video", video_path, results_summary)
     cap.release()
     cv2.destroyAllWindows()
-    print("✅ Kết thúc nhận dạng video.")
-
-if __name__ == "__main__":
-    test_video = "test_video.mp4"  # đổi tên video của bạn
-    detect_video(test_video)
+    print("✅ Kết thúc nhận dạng video và đã lưu log.")

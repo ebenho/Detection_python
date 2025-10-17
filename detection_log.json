@@ -1,0 +1,109 @@
+[
+    {
+        "timestamp": "2025-10-16 01:25:00",
+        "mode": "Ảnh",
+        "file": "sample_image.jpg",
+        "objects": [
+            {
+                "label": "laptop",
+                "confidence": 0.84
+            },
+            {
+                "label": "cell phone",
+                "confidence": 0.78
+            },
+            {
+                "label": "book",
+                "confidence": 0.66
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-10-16 01:26:15",
+        "mode": "Camera",
+        "file": "Live Camera",
+        "objects": [
+            {
+                "label": "person",
+                "confidence": 0.91
+            },
+            {
+                "label": "chair",
+                "confidence": 0.72
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-10-16 01:27:00",
+        "mode": "Video",
+        "file": "test_video.mp4",
+        "objects": [
+            {
+                "label": "laptop",
+                "confidence": 0.84
+            },
+            {
+                "label": "cell phone",
+                "confidence": 0.78
+            },
+            {
+                "label": "cup",
+                "confidence": 0.82
+            },
+            {
+                "label": "bottle",
+                "confidence": 0.74
+            },
+            {
+                "label": "person",
+                "confidence": 0.93
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-10-17 16:06:44",
+        "mode": "Ảnh",
+        "file": "C:/Users/vothe/OneDrive/Hình ảnh/z7115700337987_e21166681e32713701ef290448ec6816.jpg",
+        "objects": [
+            {
+                "label": "chair",
+                "confidence": 0.82
+            },
+            {
+                "label": "bed",
+                "confidence": 0.59
+            }
+        ]
+    },
+    {
+        "timestamp": "2025-10-17 16:06:57",
+        "mode": "Ảnh",
+        "file": "C:/Users/vothe/OneDrive/Hình ảnh/the thao.jpg",
+        "objects": [
+            {
+                "label": "person",
+                "confidence": 0.52
+            },
+            {
+                "label": "suitcase",
+                "confidence": 0.43
+            },
+            {
+                "label": "suitcase",
+                "confidence": 0.41
+            },
+            {
+                "label": "suitcase",
+                "confidence": 0.39
+            },
+            {
+                "label": "backpack",
+                "confidence": 0.33
+            },
+            {
+                "label": "bench",
+                "confidence": 0.25
+            }
+        ]
+    }
+]

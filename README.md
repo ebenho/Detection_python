@@ -1,7 +1,7 @@
 ## cách chạy: 
-## python object_detection/app.py
+## cd D:\test\Detection_python
+## python -m object_detection.app
 
-## ứng dụng nhận dạng đồ vật, loài vật và con người bằng camera, ảnh và video được load từ máy 
 
 ##
 

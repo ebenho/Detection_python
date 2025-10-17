@@ -1,0 +1,12 @@
+{
+    "version": "0.2.0",
+    "configurations": [
+        {
+            "name": "Run Object Detection App",
+            "type": "python",
+            "request": "launch",
+            "module": "object_detection.app",
+            "cwd": "${workspaceFolder}"
+        }
+    ]
+}

@@ -3,20 +3,21 @@ import os
 # Configuration settings for the object detection app
 class Config:
     # Window settings
-    WINDOW_WIDTH = 1100
+    WINDOW_WIDTH = 1400
     WINDOW_HEIGHT = 700
-    MENU_WIDTH = 200
+    MENU_WIDTH = 300
 
     # YOLO model settings
+    MODELS_DIR = os.path.dirname(__file__)
     MODEL_PATH = "yolov8n.pt"  # Sử dụng tên mô hình thống nhất
     OUTPUT_DIR = "outputs"
     RESULTS_SUBDIR = "results"
 
     # Image processing settings
-    IMAGE_W = 850  # Thêm để khớp với app.py
-    IMAGE_H = 600  # Thêm để khớp với app.py
-    IMAGE_RESIZE_WIDTH = 850
-    IMAGE_RESIZE_HEIGHT = 600
+    IMAGE_W = 1000  # Thêm để khớp với app.py
+    IMAGE_H = 700  # Thêm để khớp với app.py
+    IMAGE_RESIZE_WIDTH = 1000
+    IMAGE_RESIZE_HEIGHT = 700
 
     # Frame rate and timing
     FRAME_DELAY = 20  # milliseconds

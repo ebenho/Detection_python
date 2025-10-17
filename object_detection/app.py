@@ -1,16 +1,23 @@
 import os
 import threading
 import time
+import shutil
 import cv2
-#from torch import classes
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
-from tkinter import filedialog, messagebox
+from tkinter import filedialog
 from PIL import Image, ImageTk
 from ultralytics import YOLO
-#from webcolors import names
-from detectors.image_detector import detect_single_image
-from config import Config
+
+# ✅ Import chuẩn theo package
+from object_detection.detectors.image_detector import detect_single_image
+from object_detection.detectors.video_detector import detect_video
+from object_detection.detectors.camera_detector import CameraHandler
+from object_detection.utils.save_log import save_detection_log
+from object_detection.config import Config
+
+
+
 
 # ===== Khởi tạo thư mục =====
 os.makedirs(Config.INPUTS, exist_ok=True)
@@ -18,7 +25,7 @@ os.makedirs(os.path.join(Config.OUTPUTS, "results"), exist_ok=True)
 
 # ===== Nạp mô hình =====
 model = YOLO(os.path.join(Config.MODELS_DIR, Config.MODEL_PATH))
-
+print("✅ Mô hình YOLO đã sẵn sàng!")
 # ===== GIAO DIỆN CHÍNH =====
 root = tb.Window(themename="cosmo")
 root.title("Object Detection App")
@@ -58,7 +65,7 @@ last_status_text = ""
 
 
 # ===== KHUNG CHỨA VIDEO (Pause / Replay) =====
-video_control_frame = tb.Frame(root, bootstyle="dark")
+video_control_frame = tb.Frame(lbl, bootstyle="dark")
 video_control_frame.place_forget()
 
 # ===== THANH TRẠNG THÁI =====
@@ -78,7 +85,7 @@ frame_count = 0
 running_mode = None
 after_id = None
 paused = False
-
+current_video_path = None
 # ===== Hàm cập nhật trạng thái =====
 def update_status(msg):
     global last_status_text
@@ -87,9 +94,6 @@ def update_status(msg):
         status.config(text=msg)
         last_status_text = msg
     
-
-# ===== Nhận diện ảnh =====
-import threading
 
 # ===== Nhận diện ảnh =====
 def detect_image_gui():
@@ -112,14 +116,31 @@ def detect_image_gui():
                 root.after(0, lambda: update_status("❌ Không thể nhận diện ảnh."))
                 return
 
-            img = Image.open(output_path).resize((Config.IMAGE_RESIZE_WIDTH, Config.IMAGE_RESIZE_HEIGHT))  # Sử dụng IMAGE_RESIZE_WIDTH và IMAGE_RESIZE_HEIGHT
+            # === Đếm số lượng đối tượng ===
+            results = model(file_path, verbose=False)
+            names = results[0].names
+            classes = results[0].boxes.cls.tolist() if len(results[0].boxes) > 0 else []
+
+            # Nhóm phân loại
+            people_labels = ["person"]
+            animal_labels = ["dog", "cat", "bird", "horse", "cow", "sheep", "elephant", "bear", "zebra", "giraffe"]
+            object_labels = [n for n in names.values() if n not in people_labels + animal_labels]
+
+            num_people = sum(1 for c in classes if names[int(c)] in people_labels)
+            num_animals = sum(1 for c in classes if names[int(c)] in animal_labels)
+            num_objects = sum(1 for c in classes if names[int(c)] in object_labels)
+
+            # Hiển thị ảnh đã xử lý
+            img = Image.open(output_path).resize((Config.IMAGE_RESIZE_WIDTH, Config.IMAGE_RESIZE_HEIGHT))
             imgtk = ImageTk.PhotoImage(img)
 
             def update_ui():
                 lbl.place(x=280, y=15, relwidth=0.7, relheight=0.9)
                 lbl.config(image=imgtk)
                 lbl.image = imgtk
-                update_status(f"✅ Ảnh: {os.path.basename(file_path)} | Đã lưu: {output_path}")
+                update_status(
+                    f"ẢNH | Người: {num_people} | Động vật: {num_animals} | Đồ vật: {num_objects} | Đã lưu: {output_path}"
+                )
 
             root.after(0, update_ui)
 
@@ -139,7 +160,10 @@ def stop_current():
     if cap and cap.isOpened():
         cap.release()
     cap = None
-    video_control_frame.place_forget()
+
+    if running_mode in ("image", "camera"):
+        video_control_frame.place_forget()
+    running_mode = None
     update_status("⏹ Đã dừng video/camera.")
 
 # ===== Tạm dừng / tiếp tục =====
@@ -155,29 +179,45 @@ def toggle_pause():
 
 # ===== Phát lại video =====
 def replay_video():
-    global cap, running_mode, frame_count, paused
-    if running_mode != "video" or cap is None:
-        update_status("Không có video nào để phát lại.")
+    global cap, running_mode, frame_count, paused, current_video_path, after_id
+
+    if not current_video_path:
+        update_status("⚠️ Không có video nào để phát lại.")
         return
 
+    # Nếu video đã đóng hoặc tới cuối file → mở lại
+    if cap is None or not cap.isOpened():
+        cap = cv2.VideoCapture(current_video_path)
+        if not cap.isOpened():
+            update_status("❌ Không thể phát lại video.")
+            return
+
+    # Reset về đầu
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
     frame_count = 0
     paused = False
+    running_mode = "video"
+
+    # Cập nhật nút và trạng thái
     btn_pause.config(text="⏸ Tạm dừng", bootstyle="warning-outline")
     update_status("🔁 Phát lại video từ đầu.")
+
+    # Gọi lại luồng xử lý video
+    if after_id:
+        root.after_cancel(after_id)
+    process_stream()
 
 # ===== Xử lý video =====
 def detect_video():
     stop_current()
-    global cap, frame_count, running_mode
+    global cap, frame_count, running_mode, current_video_path, paused
     running_mode = "video"
 
-    file_path = filedialog.askopenfilename(
-        filetypes=[("Video", "*.mp4;*.avi;*.mov")]
-    )
+    file_path = filedialog.askopenfilename(filetypes=[("Video", "*.mp4;*.avi;*.mov")])
     if not file_path:
         return
-
+    
+    current_video_path = file_path
     cap = cv2.VideoCapture(file_path)
     if not cap.isOpened():
         update_status("❌ Không thể mở video.")
@@ -186,7 +226,7 @@ def detect_video():
     frame_count = 0
     update_status("🎬 Đang phát video...")
 
-    video_control_frame.place(x=1140, y=600)
+    video_control_frame.place(relx=0.02, rely=0.9)
     lbl.place(x=180, y=15, relwidth=0.7, relheight=0.9)
     process_stream()
 
@@ -220,8 +260,8 @@ def process_stream():
 
     ret, frame = cap.read()
     if not ret:
-        update_status("Kết thúc hoặc mất tín hiệu.")
-        stop_current()
+        update_status("✅ Video đã phát hết. Bấm 🔁 Phát lại để xem lại.")
+        paused = True
         return
 
     frame_count += 1
