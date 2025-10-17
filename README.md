@@ -10,5 +10,6 @@
 ## python -m pip install pillow opencv-python 
 ## python -m pip install ultralytics
 ## python -m pip install ttkbootstrap==1.10.1
-
-##
+## Python 3.11+  
+## YOLOv8 (Ultralytics)  
+## Tkinter, ttkbootstrap

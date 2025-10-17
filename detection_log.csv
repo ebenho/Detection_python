@@ -1,32 +1,109 @@
-Thời gian,Chức năng,Tên tệp,Đối tượng,Độ chính xác
-2025-10-17 16:19:22,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 16:19:22,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 16:20:45,Ảnh,me.jpg,person,0.83
-2025-10-17 16:33:55,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 16:33:55,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 16:34:20,Ảnh,z7115700337987_e21166681e32713701ef290448ec6816.jpg,chair,0.82
-2025-10-17 16:34:20,Ảnh,z7115700337987_e21166681e32713701ef290448ec6816.jpg,bed,0.59
-2025-10-17 16:58:08,Ảnh,the thao.jpg,person,0.52
-2025-10-17 16:58:08,Ảnh,the thao.jpg,suitcase,0.43
-2025-10-17 16:58:08,Ảnh,the thao.jpg,suitcase,0.41
-2025-10-17 16:58:08,Ảnh,the thao.jpg,suitcase,0.39
-2025-10-17 16:58:08,Ảnh,the thao.jpg,backpack,0.33
-2025-10-17 16:58:08,Ảnh,the thao.jpg,bench,0.25
-2025-10-17 16:58:25,Ảnh,z7115700337987_e21166681e32713701ef290448ec6816.jpg,chair,0.82
-2025-10-17 16:58:25,Ảnh,z7115700337987_e21166681e32713701ef290448ec6816.jpg,bed,0.59
-2025-10-17 17:01:57,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 17:01:57,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 17:16:28,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 17:16:28,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 17:19:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 17:19:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 17:23:49,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 17:23:49,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
-2025-10-17 17:24:00,Ảnh,the thao.jpg,person,0.52
-2025-10-17 17:24:00,Ảnh,the thao.jpg,suitcase,0.43
-2025-10-17 17:24:00,Ảnh,the thao.jpg,suitcase,0.41
-2025-10-17 17:24:00,Ảnh,the thao.jpg,suitcase,0.39
-2025-10-17 17:24:00,Ảnh,the thao.jpg,backpack,0.33
-2025-10-17 17:24:00,Ảnh,the thao.jpg,bench,0.25
-2025-10-17 17:33:15,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
-2025-10-17 17:33:15,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
+2025-10-17 18:28:33,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:28:33,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
+2025-10-17 18:28:33,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:28:33,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.87
+2025-10-17 18:32:43,Ảnh,the thao.jpg,person,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.43
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.41
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.39
+2025-10-17 18:32:43,Ảnh,the thao.jpg,backpack,0.33
+2025-10-17 18:32:43,Ảnh,the thao.jpg,bench,0.25
+2025-10-17 18:32:43,Ảnh,the thao.jpg,person,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,suitcase,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,backpack,0.52
+2025-10-17 18:32:43,Ảnh,the thao.jpg,bench,0.52
+2025-10-17 18:42:46,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:42:46,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
+2025-10-17 18:42:47,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:42:47,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
+2025-10-17 18:47:16,Camera,Live Stream,person,0.81
+2025-10-17 18:47:16,Camera,Live Stream,person,0.44
+2025-10-17 18:47:16,Camera,Live Stream,person,0.82
+2025-10-17 18:47:16,Camera,Live Stream,person,0.33
+2025-10-17 18:47:17,Camera,Live Stream,person,0.85
+2025-10-17 18:47:17,Camera,Live Stream,person,0.58
+2025-10-17 18:47:17,Camera,Live Stream,person,0.85
+2025-10-17 18:47:17,Camera,Live Stream,person,0.26
+2025-10-17 18:47:17,Camera,Live Stream,person,0.85
+2025-10-17 18:47:17,Camera,Live Stream,person,0.28
+2025-10-17 18:47:17,Camera,Live Stream,person,0.88
+2025-10-17 18:47:17,Camera,Live Stream,person,0.3
+2025-10-17 18:47:18,Camera,Live Stream,person,0.79
+2025-10-17 18:47:18,Camera,Live Stream,person,0.5
+2025-10-17 18:47:18,Camera,Live Stream,person,0.82
+2025-10-17 18:47:18,Camera,Live Stream,person,0.52
+2025-10-17 18:47:18,Camera,Live Stream,person,0.86
+2025-10-17 18:47:18,Camera,Live Stream,person,0.26
+2025-10-17 18:47:25,Video,Live Stream,laptop,0.85
+2025-10-17 18:47:25,Video,Live Stream,chair,0.62
+2025-10-17 18:47:25,Video,Live Stream,person,0.36
+2025-10-17 18:47:25,Video,Live Stream,person,0.32
+2025-10-17 18:47:26,Video,Live Stream,laptop,0.87
+2025-10-17 18:47:26,Video,Live Stream,chair,0.37
+2025-10-17 18:47:26,Video,Live Stream,person,0.26
+2025-10-17 18:47:26,Video,Live Stream,laptop,0.9
+2025-10-17 18:47:26,Video,Live Stream,chair,0.28
+2025-10-17 18:47:26,Video,Live Stream,chair,0.26
+2025-10-17 18:47:26,Video,Live Stream,laptop,0.88
+2025-10-17 18:47:26,Video,Live Stream,chair,0.38
+2025-10-17 18:47:26,Video,Live Stream,cell phone,0.28
+2025-10-17 18:47:26,Video,Live Stream,person,0.25
+2025-10-17 18:47:26,Video,Live Stream,laptop,0.79
+2025-10-17 18:47:26,Video,Live Stream,cell phone,0.6
+2025-10-17 18:47:26,Video,Live Stream,chair,0.28
+2025-10-17 18:47:26,Video,Live Stream,laptop,0.88
+2025-10-17 18:47:26,Video,Live Stream,person,0.34
+2025-10-17 18:47:26,Video,Live Stream,tv,0.3
+2025-10-17 18:47:26,Video,Live Stream,cell phone,0.27
+2025-10-17 18:47:27,Video,Live Stream,laptop,0.86
+2025-10-17 18:47:27,Video,Live Stream,cell phone,0.65
+2025-10-17 18:47:27,Video,Live Stream,cell phone,0.71
+2025-10-17 18:47:27,Video,Live Stream,laptop,0.7
+2025-10-17 18:47:27,Video,Live Stream,laptop,0.26
+2025-10-17 18:47:27,Video,Live Stream,laptop,0.84
+2025-10-17 18:47:27,Video,Live Stream,cell phone,0.76
+2025-10-17 18:47:27,Video,Live Stream,laptop,0.45
+2025-10-17 18:47:27,Video,Live Stream,person,0.31
+2025-10-17 18:47:27,Video,Live Stream,keyboard,0.3
+2025-10-17 18:47:28,Video,Live Stream,cell phone,0.91
+2025-10-17 18:47:28,Video,Live Stream,laptop,0.86
+2025-10-17 18:47:28,Video,Live Stream,laptop,0.39
+2025-10-17 18:47:28,Video,Live Stream,keyboard,0.34
+2025-10-17 18:47:28,Video,Live Stream,person,0.28
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.83
+2025-10-17 18:47:29,Video,Live Stream,cell phone,0.72
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.63
+2025-10-17 18:47:29,Video,Live Stream,keyboard,0.37
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.76
+2025-10-17 18:47:29,Video,Live Stream,cell phone,0.75
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.74
+2025-10-17 18:47:29,Video,Live Stream,keyboard,0.38
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.85
+2025-10-17 18:47:29,Video,Live Stream,chair,0.62
+2025-10-17 18:47:29,Video,Live Stream,person,0.36
+2025-10-17 18:47:29,Video,Live Stream,person,0.32
+2025-10-17 18:47:29,Video,Live Stream,laptop,0.87
+2025-10-17 18:47:29,Video,Live Stream,chair,0.37
+2025-10-17 18:47:29,Video,Live Stream,person,0.26
+2025-10-17 18:47:30,Video,Live Stream,laptop,0.9
+2025-10-17 18:47:30,Video,Live Stream,chair,0.28
+2025-10-17 18:47:30,Video,Live Stream,chair,0.26
+2025-10-17 18:47:30,Video,Live Stream,laptop,0.88
+2025-10-17 18:47:30,Video,Live Stream,chair,0.38
+2025-10-17 18:47:30,Video,Live Stream,cell phone,0.28
+2025-10-17 18:47:30,Video,Live Stream,person,0.25
+2025-10-17 18:47:30,Video,Live Stream,laptop,0.79
+2025-10-17 18:47:30,Video,Live Stream,cell phone,0.6
+2025-10-17 18:47:30,Video,Live Stream,chair,0.28
+2025-10-17 18:47:30,Video,Live Stream,laptop,0.88
+2025-10-17 18:47:30,Video,Live Stream,person,0.34
+2025-10-17 18:47:30,Video,Live Stream,tv,0.3
+2025-10-17 18:47:30,Video,Live Stream,cell phone,0.27
+2025-10-17 18:47:31,Video,Live Stream,laptop,0.86
+2025-10-17 18:47:31,Video,Live Stream,cell phone,0.65
+2025-10-17 18:47:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:47:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37
+2025-10-17 18:47:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,person,0.87
+2025-10-17 18:47:37,Ảnh,515437324_1360832621647863_496731421652450646_n.jpg,potted plant,0.37

@@ -3,17 +3,20 @@ import threading
 import time
 import shutil
 import cv2
+from matplotlib.pyplot import box
+from torch import classes
 import ttkbootstrap as tb
 from ttkbootstrap.constants import *
 from tkinter import filedialog
 from PIL import Image, ImageTk
 from ultralytics import YOLO
+from webcolors import names
 
 # ✅ Import chuẩn theo package
 from object_detection.detectors.image_detector import detect_single_image
 from object_detection.detectors.video_detector import detect_video
 from object_detection.detectors.camera_detector import CameraHandler
-from object_detection.utils.save_log import save_detection_log
+from object_detection.utils.save_log import LOG_FILE, save_detection_log
 from object_detection.config import Config
 
 
@@ -26,6 +29,8 @@ os.makedirs(os.path.join(Config.OUTPUTS, "results"), exist_ok=True)
 # ===== Nạp mô hình =====
 model = YOLO(os.path.join(Config.MODELS_DIR, Config.MODEL_PATH))
 print("✅ Mô hình YOLO đã sẵn sàng!")
+
+
 # ===== GIAO DIỆN CHÍNH =====
 root = tb.Window(themename="cosmo")
 root.title("Object Detection App")
@@ -139,8 +144,20 @@ def detect_image_gui():
                 lbl.config(image=imgtk)
                 lbl.image = imgtk
                 update_status(
-                    f"ẢNH | Người: {num_people} | Động vật: {num_animals} | Đồ vật: {num_objects} | Đã lưu: {output_path}"
-                )
+                 f"ẢNH | Người: {num_people} | Động vật: {num_animals} | Đồ vật: {num_objects} | Đã lưu: {output_path}"
+    )
+
+              # === Ghi log nhận diện ===
+                detected_objects = []
+                if len(results[0].boxes) > 0:
+                    for box in results[0].boxes:
+                        cls = int(box.cls[0])
+                        conf = float(box.conf[0])
+                        label = results[0].names[cls]
+                        detected_objects.append((label, conf))
+
+                if detected_objects:
+                    save_detection_log("Ảnh", file_path, detected_objects)
 
             root.after(0, update_ui)
 
@@ -301,15 +318,112 @@ def process_stream():
         update_status(
     f"{running_mode.upper()} | FPS: {fps:.1f} | Người: {num_people} |  Động vật: {num_animals} | Đồ vật: {num_objects}"
 )
+        # === Ghi log nhận diện ===
+        detected_objects = []
+        if len(results[0].boxes) > 0:
+         for box in results[0].boxes:
+             cls = int(box.cls[0])
+             conf = float(box.conf[0])
+             label = results[0].names[cls]
+             detected_objects.append((label, conf))
+
+        if detected_objects:
+            save_detection_log(running_mode.capitalize(), "Live Stream", detected_objects)
+
 
     after_id = root.after(Config.FRAME_DELAY, process_stream)
 
+# ===== MỞ CỬA SỔ LỊCH SỬ =====
+import csv
+
+def open_history_window():
+    """Mở cửa sổ pastel hiển thị lịch sử nhận diện"""
+    import object_detection.utils.save_log as log_file_ref
+    LOG_FILE = log_file_ref.LOG_FILE
+    print(f"[DEBUG] Đang đọc log từ: {LOG_FILE}")
+
+    PASTEL_BG = "#F9FBFD"
+    HEADER_BG = "#CDE8E5"
+    ROW_ODD = "#E8F0F2"
+    ROW_EVEN = "#F6FAFA"
+    TEXT_COLOR = "#211E20"
+    HIGHLIGHT = "#99CCCC"
+
+    history_win = tb.Toplevel()
+    history_win.title("📜 Lịch sử nhận diện đối tượng")
+    history_win.geometry("950x500")
+    history_win.configure(bg=PASTEL_BG)
+
+    title = tb.Label(
+        history_win,
+        text="🗂️ Lịch sử nhận diện đối tượng",
+        font=("Segoe UI", 16, "bold"),
+        background=PASTEL_BG,
+        foreground="#2E8B8B",
+    )
+    title.pack(pady=10)
+
+    frame = tb.Frame(history_win)
+    frame.pack(expand=True, fill="both", padx=15, pady=5)
+
+    columns = ("Thời gian", "Chức năng", "Tên tệp", "Đối tượng", "Độ chính xác")
+    table = tb.Treeview(frame, columns=columns, show="headings", height=15)
+
+    for col in columns:
+        table.heading(col, text=col)
+        table.column(col, anchor="center", width=180)
+
+    scroll_y = tb.Scrollbar(frame, orient="vertical", command=table.yview)
+    table.configure(yscrollcommand=scroll_y.set)
+    scroll_y.pack(side="right", fill="y")
+    table.pack(expand=True, fill="both")
+
+    style = tb.Style("cosmo")
+    style.configure(
+        "Treeview",
+        background=ROW_EVEN,
+        foreground=TEXT_COLOR,
+        rowheight=28,
+        fieldbackground=ROW_EVEN,
+        font=("Segoe UI", 10),
+    )
+    style.configure(
+        "Treeview.Heading",
+        font=("Segoe UI", 11, "bold"),
+        background=HEADER_BG,
+        foreground=TEXT_COLOR,
+    )
+    style.map("Treeview", background=[("selected", HIGHLIGHT)])
+
+    def load_data():
+        for row in table.get_children():
+            table.delete(row)
+        if os.path.exists(LOG_FILE):
+            with open(LOG_FILE, "r", encoding="utf-8") as f:
+                reader = csv.reader(f)
+                next(reader, None)  # bỏ header
+                for i, row in enumerate(reader):
+                    print("[DEBUG] Dòng log:", row)  # ✅ đúng vị trí
+                    tag = "evenrow" if i % 2 == 0 else "oddrow"
+                    table.insert("", "end", values=row, tags=(tag,))
+        else:
+            table.insert("", "end", values=("⚠️", "Chưa có dữ liệu", "", "", ""))
+
+        table.tag_configure("oddrow", background=ROW_ODD)
+        table.tag_configure("evenrow", background=ROW_EVEN)
+
+    tb.Button(
+        history_win, text="🔄 Làm mới dữ liệu", bootstyle="success", width=18, command=load_data
+    ).pack(pady=8)
+
+    load_data()
 
 # ===== Nút MENU =====
 tb.Button(menu_frame, text="📷 Ảnh", bootstyle=SUCCESS, command=detect_image_gui, width=15).pack(pady=15)
 tb.Button(menu_frame, text="🎥 Video", bootstyle=INFO, command=detect_video, width=15).pack(pady=15)
 tb.Button(menu_frame, text="📡 Camera", bootstyle=PRIMARY, command=detect_camera, width=15).pack(pady=15)
 tb.Button(menu_frame, text="❌ Thoát", bootstyle=DANGER, command=root.destroy, width=15).pack(pady=15)
+tb.Button(menu_frame, text="📜 Lịch sử", bootstyle=SECONDARY, command=open_history_window, width=15).pack(pady=15)
 
 # ===== Nút điều khiển video =====
 btn_pause = tb.Button(video_control_frame, text="⏸ Tạm dừng", bootstyle="warning", width=12, padding=5, command=toggle_pause)
@@ -317,6 +431,8 @@ btn_pause.pack(side="left", padx=10, pady=8)
 
 btn_replay = tb.Button(video_control_frame, text="🔁 Phát lại", bootstyle="info", width=12, padding=5, command=replay_video)
 btn_replay.pack(side="left", padx=10, pady=8)
+
+
 
 # ===== Chạy ứng dụng =====
 root.mainloop()
